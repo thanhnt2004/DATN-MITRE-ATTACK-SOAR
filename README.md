@@ -1,5 +1,5 @@
 # DATN – MITRE ATT&CK Detection & Automated Response
-
+ssh -i ".pem" ubuntu@18.139.50.205
 ## Đề tài
 **Xây dựng và đánh giá hệ thống phát hiện và ứng phó tự động theo MITRE ATT&CK**
 
