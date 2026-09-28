@@ -1,125 +1,79 @@
-# Hướng dẫn ghép / nâng cấp RAM cho Server
+# Nâng RAM cho AWS EC2 DATN
 
-Tài liệu này dùng để ghi lại cả hai trường hợp: server vật lý và máy ảo/cloud.
+## 1. EC2 không ghép RAM vật lý
+Instance hiện tại là AWS EC2 nên không thể gắn thêm thanh RAM như máy vật lý. Muốn tăng RAM phải **đổi Instance Type**.
 
-## 1. Kiểm tra RAM hiện tại
-
-```bash
-free -h
-sudo dmidecode --type memory
-```
-
-Có thể xem nhanh:
-
-```bash
-sudo dmidecode -t memory | grep -E "Size:|Type:|Speed:|Manufacturer:|Part Number:"
-```
-
-## 2. Nếu là máy vật lý
-
-Trước khi mua/thêm RAM cần xác định:
-
-- loại RAM: DDR4/DDR5,
-- chuẩn DIMM/SODIMM,
-- số khe RAM,
-- dung lượng tối đa mainboard hỗ trợ,
-- dung lượng tối đa mỗi khe,
-- bus RAM hỗ trợ,
-- RAM ECC hay non-ECC,
-- các thanh RAM hiện có.
-
-Ưu tiên ghép RAM có cùng:
-
-- loại DDR,
-- điện áp,
-- bus,
-- dung lượng,
-- timing,
-- hãng/model nếu có thể.
-
-Ví dụ:
-
+Hiện tại:
 ```text
-Slot 1: 8 GB DDR4 3200
-Slot 2: 8 GB DDR4 3200
-Total : 16 GB
+m7i-flex.large
+2 vCPU
+~8 GiB RAM
 ```
 
-### Quy trình
+## 2. Quy trình nâng RAM
 
-1. Shutdown server an toàn.
-2. Ngắt nguồn điện.
-3. Chống tĩnh điện.
-4. Kiểm tra đúng khe RAM.
-5. Lắp RAM chắc chắn.
-6. Khởi động máy.
-7. Kiểm tra BIOS/UEFI.
-8. Kiểm tra lại trong Ubuntu.
-
+### Bước 1 – Kiểm tra trước khi dừng
 ```bash
+uptime
 free -h
-sudo dmidecode --type memory
+df -h
+docker ps
 ```
 
-Không tháo/lắp RAM khi máy đang bật.
-
-## 3. Nếu là VMware/VirtualBox/Hyper-V
-
-Tắt hoàn toàn VM trước khi đổi RAM.
-
-Sau đó:
-
-1. mở cấu hình VM,
-2. tăng Memory/RAM,
-3. lưu cấu hình,
-4. bật VM,
-5. kiểm tra bằng:
-
+Nếu đang chạy Docker Compose:
 ```bash
-free -h
+docker compose down
 ```
 
-## 4. Nếu là cloud
+### Bước 2 – Stop instance
+```text
+EC2 → Instances → DATN_TB → Instance state → Stop instance
+```
 
-Cloud VM thường không "ghép thanh RAM". Cần đổi instance shape/type sang cấu hình có nhiều RAM hơn.
+Đợi trạng thái `Stopped`.
 
-Quy trình tổng quát:
+### Bước 3 – Đổi Instance Type
+```text
+Actions → Instance settings → Change instance type
+```
 
-1. backup/snapshot nếu cần,
-2. stop instance nếu provider yêu cầu,
-3. resize/change instance type,
-4. start instance,
-5. kiểm tra:
+Chọn instance có RAM cao hơn. Với ELK + Shuffle trên cùng máy, mục tiêu khoảng 16 GiB RAM là hợp lý cho lab.
 
+### Bước 4 – Start lại
+```text
+Instance state → Start instance
+```
+
+Đợi `2/2 status checks passed`.
+
+### Bước 5 – Kiểm tra
 ```bash
-nproc
 free -h
+lscpu
+uname -a
 lsblk
+df -h
 ```
 
-Trước khi resize phải kiểm tra chi phí vì tăng RAM/vCPU thường làm tăng giá.
+## 3. Lưu ý Public IP
+Nếu dùng auto-assigned Public IPv4, IP có thể thay đổi sau stop/start. Không hard-code IP public vào repository, Sigma rule hoặc Shuffle workflow.
 
-## 5. Sau khi tăng RAM cho ELK
+## 4. Dữ liệu
+EBS thường vẫn giữ dữ liệu qua stop/start và đổi instance type, nhưng trước thay đổi lớn nên:
+- commit config lên GitHub;
+- backup/export workflow và rules;
+- cân nhắc snapshot EBS;
+- kiểm tra Docker volume / Elasticsearch data path.
 
-Kiểm tra container:
-
+## 5. Swap
+Nếu đã tạo swap 4 GiB có thể giữ lại:
 ```bash
-docker stats
+swapon --show
+free -h
 ```
 
-Nếu Elasticsearch dùng Docker và có cấu hình heap:
+## 6. Theo dõi thay đổi
 
-```yaml
-environment:
-  - ES_JAVA_OPTS=-Xms2g -Xmx2g
-```
-
-Không nên tự động cấp toàn bộ RAM của máy cho Elasticsearch. Phải chừa tài nguyên cho hệ điều hành, Docker, Kibana, Logstash và Shuffle.
-
-## 6. Ghi lại thay đổi
-
-Sau mỗi lần nâng cấp, cập nhật:
-
-| Ngày | RAM trước | RAM sau | Lý do | Người thực hiện |
-|---|---:|---:|---|---|
-| YYYY-MM-DD | TBD | TBD | TBD | TBD |
+| Ngày | Instance trước | Instance sau | RAM trước | RAM sau | Lý do |
+|---|---|---|---:|---:|---|
+| YYYY-MM-DD | m7i-flex.large | TBD | ~8 GiB | TBD | TBD |

@@ -1,130 +1,120 @@
 # Cấu hình Server DATN
 
-## 1. Vai trò server
+## 1. Thông tin thực tế đã kiểm tra
 
-Server trung tâm dự kiến chạy:
-
-- Docker Engine
-- Docker Compose
-- Elasticsearch
-- Kibana
-- Logstash (nếu cần)
-- Shuffle SOAR
-- Sigma rules/configuration
-- Script quản trị và backup
-
-## 2. Thông tin cần ghi lại
-
-Khi triển khai thực tế, cập nhật bảng sau:
-
-| Thông tin | Giá trị |
+| Hạng mục | Giá trị |
 |---|---|
-| Provider / Hypervisor | TBD |
-| OS | Ubuntu Server |
-| Hostname | TBD |
-| Public IP | Không commit nếu không cần thiết |
-| Private IP | TBD |
-| vCPU | TBD |
-| RAM | TBD |
-| Disk | TBD |
-| Docker version | TBD |
-| Docker Compose version | TBD |
+| Provider | AWS EC2 |
+| Instance type | `m7i-flex.large` |
+| OS | Ubuntu 24.04.4 LTS |
+| Kernel | Linux 6.17.0-1017-aws |
+| Architecture | x86-64 |
+| CPU model | Intel Xeon Platinum 8488C |
+| vCPU | 2 |
+| RAM usable | 7.6 GiB (~8 GiB) |
+| Swap | 0 B tại thời điểm kiểm tra |
+| Disk | 80 GB EBS |
+| Root filesystem | ~77 GB |
+| Root used | ~1.9 GB |
+| Root available | ~75 GB |
+| Timezone | Asia/Ho_Chi_Minh (+07) |
+| UFW | inactive |
+| Docker | chưa cài tại thời điểm kiểm tra |
+| SSH | TCP/22 đang listen |
 
-Không lưu password, SSH private key, token hoặc secret trực tiếp trong repository.
+Không lưu Public IPv4, AWS Account ID, SSH private key hoặc credential trong repository public.
 
-## 3. Lệnh kiểm tra cấu hình Ubuntu
+## 2. CPU
 
-### CPU
-
-```bash
-lscpu
-nproc
+```text
+CPU(s): 2
+Model name: Intel(R) Xeon(R) Platinum 8488C
+Thread(s) per core: 2
+Core(s) per socket: 1
+Socket(s): 1
 ```
 
-### RAM
+## 3. RAM
 
+```text
+Total:      7.6 GiB
+Used:       ~466 MiB
+Available:  ~7.1 GiB
+Swap:       0 B
+```
+
+### Tạo swap 4 GiB
+```bash
+sudo fallocate -l 4G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+```
+
+Kiểm tra:
 ```bash
 free -h
-sudo dmidecode --type memory
+swapon --show
 ```
 
-### Disk
+Swap là vùng dự phòng, không thay thế RAM thật.
+
+## 4. Storage
+
+```text
+nvme0n1      80G
+└─nvme0n1p1  ~79G mounted at /
+```
+
+Elasticsearch có thể tăng disk nhanh theo lượng log; cần theo dõi retention/ILM.
+
+## 5. Network
+
+Private IPv4 tại thời điểm kiểm tra:
+```text
+172.31.44.226/20
+```
+
+Default gateway:
+```text
+172.31.32.1
+```
+
+AWS VPC DNS:
+```text
+172.31.0.2
+```
+
+Port listen lúc kiểm tra: SSH TCP/22.
+
+## 6. Firewall / Security Group
+
+UFW đang inactive. Trên EC2 nên kiểm soát truy cập bằng Security Group:
+
+- SSH 22: chỉ IP quản trị.
+- Kibana 5601: giới hạn IP/VPN.
+- Elasticsearch 9200: không public Internet.
+- Shuffle: chỉ mở cổng web/API cần thiết.
+
+## 7. Lệnh kiểm tra nhanh
 
 ```bash
+hostnamectl
+lscpu
+free -h
 lsblk
 df -h
-```
-
-### Network
-
-```bash
 ip addr
 ip route
-ss -tulpn
-```
-
-### OS
-
-```bash
-cat /etc/os-release
-uname -a
-```
-
-### Docker
-
-```bash
+resolvectl status
+sudo ss -tulpn
+sudo ufw status verbose
+timedatectl
 docker --version
 docker compose version
-docker ps
-docker system df
 ```
 
-## 4. Cấu hình tài nguyên khuyến nghị cho lab
+## 8. Đánh giá tài nguyên
 
-Cấu hình phụ thuộc lượng log và số container. Với lab 2 thành viên:
-
-- 4 vCPU trở lên: hợp lý cho giai đoạn đầu.
-- 8 GB RAM: mức tối thiểu thực tế nếu chạy nhiều dịch vụ cùng lúc.
-- 12–16 GB RAM: thuận lợi hơn cho ELK + Shuffle.
-- SSD: ưu tiên hơn HDD.
-- Dung lượng disk nên theo dõi thường xuyên do Elasticsearch tăng nhanh theo lượng log.
-
-Đây là cấu hình lab tham khảo, không phải sizing cho production.
-
-## 5. Kiểm tra dịch vụ sau reboot
-
-```bash
-uptime
-who -b
-last reboot | head
-systemctl --failed
-docker ps
-```
-
-## 6. Theo dõi tài nguyên
-
-```bash
-htop
-free -h
-df -h
-docker stats
-```
-
-Nếu thiếu `htop`:
-
-```bash
-sudo apt update
-sudo apt install -y htop
-```
-
-## 7. Quy tắc cấu hình
-
-Mọi thay đổi quan trọng nên được ghi vào repository, ví dụ:
-
-- tăng RAM,
-- tăng disk,
-- thay đổi port,
-- thêm container,
-- thay đổi heap Elasticsearch,
-- thêm endpoint,
-- thay đổi network/security group.
+2 vCPU / 8 GiB RAM / 80 GB phù hợp cho PoC/lab nhỏ. Khi chạy ELK + Shuffle đồng thời, 16 GiB RAM sẽ an toàn hơn hoặc tách Shuffle sang máy khác.

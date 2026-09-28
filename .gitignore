@@ -1,0 +1,35 @@
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+credentials/
+
+# Logs / runtime
+*.log
+logs/
+tmp/
+data/
+elasticsearch-data/
+kibana-data/
+logstash-data/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Archives generated locally
+*.tar
+*.tar.gz
+*.zip
