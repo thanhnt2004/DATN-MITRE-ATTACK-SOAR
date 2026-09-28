@@ -8,7 +8,7 @@ services:
       xpack.security.enabled: "false"
       ES_JAVA_OPTS: "-Xms2g -Xmx2g"
     ports:
-      - "127.0.0.1:9200:9200"
+      - "9200:9200"
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
     networks:
@@ -48,7 +48,7 @@ services:
       LS_JAVA_OPTS: "-Xms512m -Xmx512m"
     ports:
       - "5044:5044"
-      - "127.0.0.1:9600:9600"
+      - "9600:9600"
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
     networks:

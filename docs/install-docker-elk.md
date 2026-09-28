@@ -72,10 +72,10 @@ Cấu hình:
 - Logstash JVM heap: 512 MiB
 - Logstash container limit: 1 GiB
 
-Elasticsearch chỉ bind localhost:
+Elasticsearch REST API:
 
 ```text
-127.0.0.1:9200
+0.0.0.0:9200
 ```
 
 Kibana:
@@ -90,10 +90,10 @@ Logstash Beats input:
 0.0.0.0:5044
 ```
 
-Logstash API chỉ bind localhost:
+Logstash API:
 
 ```text
-127.0.0.1:9600
+0.0.0.0:9600
 ```
 
 ## 4. Tải image
@@ -148,10 +148,10 @@ Baseline đề xuất:
 | 22/TCP | SSH | IP quản trị |
 | 5601/TCP | Kibana | IP quản trị |
 | 5044/TCP | Beats -> Logstash | IP endpoint/lab |
-| 9200/TCP | Elasticsearch | Không public |
-| 9600/TCP | Logstash API | Không public |
+| 9200/TCP | Elasticsearch | IP quản trị/lab |
+| 9600/TCP | Logstash API | IP quản trị/lab |
 
-Không mở Elasticsearch `9200` ra `0.0.0.0/0`.
+Chỉ whitelist IP quản trị/lab cho `9200` và `9600`; không mở `0.0.0.0/0` khi security đang tắt.
 
 ## 9. Logstash pipeline
 
