@@ -1,5 +1,5 @@
 # DATN – MITRE ATT&CK Detection & Automated Response
-ssh -i ".pem" ubuntu@18.139.50.205
+
 ## Đề tài
 **Xây dựng và đánh giá hệ thống phát hiện và ứng phó tự động theo MITRE ATT&CK**
 
@@ -75,7 +75,16 @@ DATN-MITRE-ATTACK-SOAR/
 - ~8 GiB RAM
 - 80 GB EBS
 - Timezone: Asia/Ho_Chi_Minh
-- Docker: chưa cài tại thời điểm kiểm tra
+- Docker/Compose: đã cài và đang chạy Elasticsearch, Kibana, Logstash `9.5.4`
+
+## Trạng thái lab mới nhất
+
+- Ubuntu `prod-web-01`: Nginx -> Gunicorn -> Flaskr/SQLite, đặt sau pfSense trên VMnet10.
+- Logstash: Beats input `5044/TCP`, dành cho nguồn telemetry của lab Thanh.
+- Hai nguồn của Bình: Winlogbeat và Auditbeat đang gửi trực tiếp đến Elasticsearch `9200/TCP` theo ngoại lệ tạm thời của nhóm.
+- Cảnh báo: Elastic security hiện tắt; Kibana và các API chỉ được phép mở cho đúng IP nguồn `/32`, không dùng `0.0.0.0/0`.
+
+Xem [báo cáo đối chiếu 2026-10-08](docs/2026-10-08-lab-web-elk-status.md).
 
 Xem chi tiết tại [docs/server-configuration.md](docs/server-configuration.md).
 

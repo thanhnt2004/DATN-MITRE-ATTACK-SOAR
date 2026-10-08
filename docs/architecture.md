@@ -40,14 +40,17 @@ Shuffle Workflow
   +--> Response Action
 ```
 
-## 3. Luồng dữ liệu
+## 3. Luồng dữ liệu thực tế
 
 ```text
-[Windows/Linux Endpoint]
+[Endpoint lab Thanh]
           |
-          | Event / Syslog / Agent
+          | Beats 5044/TCP
           v
-      [ELK Stack]
+       [Logstash]
+          |
+          v
+   [Elasticsearch]
           |
           | Detection
           v
@@ -61,6 +64,16 @@ Shuffle Workflow
           |
           +------> Automated Response
 ```
+
+Ngoại lệ tạm thời đang được nhóm chấp nhận:
+
+```text
+[Windows của Bình / Winlogbeat] --+
+                                  +--> Elasticsearch 9200/TCP --> Kibana
+[Linux của Bình / Auditbeat] -----+
+```
+
+Đường trực tiếp không qua filter của Logstash. Chỉ whitelist đúng địa chỉ nguồn `/32`; không mở `9200/TCP` cho toàn Internet.
 
 ## 4. Mô hình triển khai hai thành viên
 
