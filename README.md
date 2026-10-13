@@ -80,9 +80,15 @@ DATN-MITRE-ATTACK-SOAR/
 ## Trạng thái lab mới nhất
 
 - Ubuntu `prod-web-01`: Nginx -> Gunicorn -> Flaskr/SQLite, đặt sau pfSense trên VMnet10.
-- Logstash: Beats input `5044/TCP`, dành cho nguồn telemetry của lab Thanh.
+- Filebeat 9.5.4 thu thập system/auth/Nginx log và gửi đến Logstash qua TLS `5044/TCP`.
+- Ubuntu đang nhận Syslog dành cho pfSense tại `5514/UDP` và chuyển tiếp bằng Filebeat.
+- Log Ubuntu và marker relay pfSense đã xuất hiện đúng trong các index `datn-ubuntu-*` và `datn-pfsense-*`.
+- Log thật từ pfSense chưa được xác minh; cần bật Remote Logging đến `192.168.10.103:5514`.
 - Hai nguồn của Bình: Winlogbeat và Auditbeat đang gửi trực tiếp đến Elasticsearch `9200/TCP` theo ngoại lệ tạm thời của nhóm.
+- Elasticsearch đang ở trạng thái `yellow` do mô hình một node không thể phân bổ replica; primary shard vẫn hoạt động.
 - Cảnh báo: Elastic security hiện tắt; Kibana và các API chỉ được phép mở cho đúng IP nguồn `/32`, không dùng `0.0.0.0/0`.
+
+Xem [tiến độ kết nối log Ubuntu và pfSense ngày 13/10/2026](docs/2026-10-13-ubuntu-pfsense-log-ingestion.md).
 
 Xem [báo cáo đối chiếu 2026-10-08](docs/2026-10-08-lab-web-elk-status.md).
 
