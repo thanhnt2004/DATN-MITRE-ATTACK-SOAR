@@ -51,6 +51,7 @@ services:
       - "9600:9600"
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./logstash/certs:/usr/share/logstash/certs:ro
     networks:
       - datn-elk
     mem_limit: 1g
