@@ -90,6 +90,8 @@ DATN-MITRE-ATTACK-SOAR/
 
 Xem [tiến độ kết nối log Ubuntu và pfSense ngày 13/10/2026](docs/2026-10-13-ubuntu-pfsense-log-ingestion.md).
 
+Xem [báo cáo rà soát toàn bộ hạ tầng ngày 13/10/2026](docs/2026-10-13-infrastructure-audit.md) và [kiểm kê backup](docs/backup-inventory.md).
+
 Xem [báo cáo đối chiếu 2026-10-08](docs/2026-10-08-lab-web-elk-status.md).
 
 Xem chi tiết tại [docs/server-configuration.md](docs/server-configuration.md).
