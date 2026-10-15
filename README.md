@@ -84,13 +84,15 @@ DATN-MITRE-ATTACK-SOAR/
 - Ubuntu đang nhận Syslog dành cho pfSense tại `5514/UDP` và chuyển tiếp bằng Filebeat.
 - Log Ubuntu và marker relay pfSense đã xuất hiện đúng trong các index `datn-ubuntu-*` và `datn-pfsense-*`.
 - Log thật từ pfSense chưa được xác minh; cần bật Remote Logging đến `192.168.10.103:5514`.
-- Hai nguồn của Bình: Winlogbeat và Auditbeat đang gửi trực tiếp đến Elasticsearch `9200/TCP` theo ngoại lệ tạm thời của nhóm.
+- Hai nguồn Winlogbeat và Auditbeat có dữ liệu lịch sử qua Elasticsearch `9200/TCP`; lần kiểm tra 15/10 chưa thấy log mới từ Windows.
 - Elasticsearch đang ở trạng thái `yellow` do mô hình một node không thể phân bổ replica; primary shard vẫn hoạt động.
 - Cảnh báo: Elastic security hiện tắt; Kibana và các API chỉ được phép mở cho đúng IP nguồn `/32`, không dùng `0.0.0.0/0`.
 
 Xem [tiến độ kết nối log Ubuntu và pfSense ngày 13/10/2026](docs/2026-10-13-ubuntu-pfsense-log-ingestion.md).
 
 Xem [báo cáo rà soát toàn bộ hạ tầng ngày 13/10/2026](docs/2026-10-13-infrastructure-audit.md) và [kiểm kê backup](docs/backup-inventory.md).
+
+Xem [báo cáo kiểm tra ELK, Shuffle và luồng log ngày 15/10/2026](docs/2026-10-15_status-elk-shuffle-report.md).
 
 Xem [báo cáo đối chiếu 2026-10-08](docs/2026-10-08-lab-web-elk-status.md).
 
