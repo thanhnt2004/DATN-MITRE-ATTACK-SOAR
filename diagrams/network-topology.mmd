@@ -1,0 +1,25 @@
+flowchart LR
+  subgraph vmware["VMware VMnet10 - 192.168.10.0/24"]
+    pfs["pfSense\nLAN 192.168.10.1"]
+    win["Windows 10\n192.168.10.101"]
+    kali["Kali test\n192.168.10.102"]
+    ubuntu["Ubuntu prod-web-01\n192.168.10.103"]
+    win -->|"gateway/DNS"| pfs
+    kali -->|"gateway/DNS"| pfs
+    ubuntu -->|"gateway/DNS"| pfs
+    pfs -->|"syslog UDP/5514"| ubuntu
+  end
+  internet((Internet))
+  pfs -->|"NAT/WAN"| internet
+  ubuntu -->|"Filebeat TLS/TCP 5044"| internet
+  win -. "Winlogbeat 9200 legacy or 5044 target" .-> internet
+  subgraph aws["AWS EC2 - Ubuntu 24.04"]
+    logstash["Logstash :5044"]
+    elastic["Elasticsearch :9200"]
+    kibana["Kibana :5601"]
+    shuffle["Shuffle frontend :3001"]
+    logstash --> elastic --> kibana
+    kibana -. "webhook internal" .-> shuffle
+  end
+  internet --> logstash
+  internet -. "legacy Beats" .-> elastic

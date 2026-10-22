@@ -1,0 +1,18 @@
+sequenceDiagram
+  actor Operator as Lab operator
+  participant Endpoint as Windows/Ubuntu/pfSense
+  participant Logstash
+  participant Elastic as Elasticsearch
+  participant Kibana
+  participant Shuffle as Shuffle webhook
+  participant Worker as Shuffle worker/app
+  Operator->>Endpoint: Run authorized Atomic test
+  Endpoint->>Logstash: Event via Beats TLS/5044
+  Logstash->>Elastic: Normalize and index
+  Kibana->>Elastic: Detection rule query
+  Elastic-->>Kibana: Matching event / alert ID
+  Kibana->>Shuffle: Webhook with alert payload
+  Shuffle->>Worker: Start workflow execution
+  Worker-->>Shuffle: Action result SUCCESS
+  Shuffle-->>Kibana: HTTP acknowledgement
+  Note over Kibana,Shuffle: Evidence maps alert ID to execution ID

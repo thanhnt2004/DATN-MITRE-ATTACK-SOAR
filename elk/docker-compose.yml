@@ -31,10 +31,14 @@ services:
       ELASTICSEARCH_HOSTS: "http://elasticsearch:9200"
       SERVER_HOST: "0.0.0.0"
       NODE_OPTIONS: "--max-old-space-size=768"
+      XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: "${KIBANA_ENCRYPTEDSAVEDOBJECTS_KEY:?set in elk/.env}"
+      XPACK_SECURITY_ENCRYPTIONKEY: "${KIBANA_SECURITY_KEY:?set in elk/.env}"
+      XPACK_REPORTING_ENCRYPTIONKEY: "${KIBANA_REPORTING_KEY:?set in elk/.env}"
     ports:
       - "5601:5601"
     networks:
       - datn-elk
+      - elk-shuffle-integration
     mem_limit: 1200m
     depends_on:
       elasticsearch:
@@ -65,3 +69,6 @@ volumes:
 networks:
   datn-elk:
     driver: bridge
+  elk-shuffle-integration:
+    external: true
+    name: elk-shuffle-integration

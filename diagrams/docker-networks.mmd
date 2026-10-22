@@ -1,0 +1,29 @@
+flowchart LR
+  subgraph elk["elk_datn-elk - 172.18.0.0/16"]
+    es["datn-elasticsearch\n172.18.0.2"]
+    kb["datn-kibana\n172.18.0.3"]
+    ls["datn-logstash\n172.18.0.4"]
+  end
+  subgraph shared["elk-shuffle-integration - 172.20.0.0/16"]
+    kb2["datn-kibana\n172.20.0.2"]
+    sf2["shuffle-frontend\n172.20.0.3"]
+  end
+  subgraph core["shuffle_shuffle - 172.19.0.0/16"]
+    os["shuffle-opensearch\n172.19.0.2"]
+    be["shuffle-backend\n172.19.0.3"]
+    orb["shuffle-orborus\n172.19.0.4"]
+    sec["shuffle-security\n172.19.0.5"]
+    sf["shuffle-frontend\n172.19.0.6"]
+  end
+  subgraph swarm["shuffle_swarm_executions - 10.224.224.0/24"]
+    worker["shuffle-workers 1/1"]
+    apps["App services 3/3"]
+    runtime["Orborus + Backend"]
+  end
+  kb --- kb2
+  sf2 --- sf
+  kb2 -->|"HTTP webhook"| sf2
+  sf --> be --> os
+  orb --> worker --> apps
+  runtime --- be
+  runtime --- orb

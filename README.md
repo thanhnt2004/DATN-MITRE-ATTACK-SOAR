@@ -82,11 +82,15 @@ DATN-MITRE-ATTACK-SOAR/
 - Ubuntu `prod-web-01`: Nginx -> Gunicorn -> Flaskr/SQLite, đặt sau pfSense trên VMnet10.
 - Filebeat 9.5.4 thu thập system/auth/Nginx log và gửi đến Logstash qua TLS `5044/TCP`.
 - Ubuntu đang nhận Syslog dành cho pfSense tại `5514/UDP` và chuyển tiếp bằng Filebeat.
-- Log Ubuntu và marker relay pfSense đã xuất hiện đúng trong các index `datn-ubuntu-*` và `datn-pfsense-*`.
-- Log thật từ pfSense chưa được xác minh; cần bật Remote Logging đến `192.168.10.103:5514`.
-- Hai nguồn Winlogbeat và Auditbeat có dữ liệu lịch sử qua Elasticsearch `9200/TCP`; lần kiểm tra 15/10 chưa thấy log mới từ Windows.
+- Log Ubuntu và log pfSense đã xuất hiện trong các index `datn-ubuntu-*` và `datn-pfsense-*`; khi VM tắt sẽ không có telemetry mới.
+- Windows/Winlogbeat và Linux/Auditbeat đã có dữ liệu trong Elasticsearch; cấu hình guest chi tiết phải được đối chiếu trên đúng VM trước mỗi buổi demo.
 - Elasticsearch đang ở trạng thái `yellow` do mô hình một node không thể phân bổ replica; primary shard vẫn hoạt động.
+- Kibana đã có ba encryption key; Actions và Rules API trả HTTP `200`.
+- Docker Swarm một node, worker Shuffle và app runtime đã hoạt động; workflow Manual đã kết thúc `FINISHED` với action `SUCCESS`.
+- Kết nối dùng chung `elk-shuffle-integration` nối Kibana với Shuffle frontend; connector/webhook end-to-end chưa được tạo.
 - Cảnh báo: Elastic security hiện tắt; Kibana và các API chỉ được phép mở cho đúng IP nguồn `/32`, không dùng `0.0.0.0/0`.
+
+Tài liệu hợp nhất mới nhất: [kiểm kê cấu hình, tài khoản/key đã che, sơ đồ mạng và runbook ngày 22/10/2026](docs/2026-10-22_configuration-inventory-and-network-guide.md).
 
 Xem [tiến độ kết nối log Ubuntu và pfSense ngày 13/10/2026](docs/2026-10-13-ubuntu-pfsense-log-ingestion.md).
 

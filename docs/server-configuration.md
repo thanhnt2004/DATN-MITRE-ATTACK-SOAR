@@ -6,20 +6,21 @@
 |---|---|
 | Provider | AWS EC2 |
 | Instance type | `m7i-flex.large` |
-| OS | Ubuntu 24.04.4 LTS |
-| Kernel | Linux 6.17.0-1017-aws |
+| OS | Ubuntu 24.04.5 LTS |
+| Kernel | Linux 7.0.0-1013-aws |
 | Architecture | x86-64 |
 | CPU model | Intel Xeon Platinum 8488C |
 | vCPU | 2 |
 | RAM usable | 7.6 GiB (~8 GiB) |
-| Swap | 0 B tại thời điểm kiểm tra |
+| Swap | 4 GiB; khoảng 0,8 GiB đang dùng lúc kiểm tra 22/10 |
 | Disk | 80 GB EBS |
 | Root filesystem | ~77 GB |
-| Root used | ~1.9 GB |
-| Root available | ~75 GB |
+| Root used | ~26 GB |
+| Root available | ~51 GB |
 | Timezone | Asia/Ho_Chi_Minh (+07) |
 | UFW | inactive |
-| Docker | chưa cài tại thời điểm kiểm tra |
+| Docker | Engine 29.8.1; Compose 5.5.1; Swarm active |
+| Runtime | ELK 9.5.4 và Shuffle SOAR đang chạy đồng thời |
 | SSH | TCP/22 đang listen |
 
 Không lưu Public IPv4, AWS Account ID, SSH private key hoặc credential trong repository public.
@@ -38,12 +39,12 @@ Socket(s): 1
 
 ```text
 Total:      7.6 GiB
-Used:       ~466 MiB
-Available:  ~7.1 GiB
-Swap:       0 B
+Used:       ~6.7 GiB tại thời điểm kiểm tra
+Available:  ~0.9 GiB tại thời điểm kiểm tra
+Swap:       4.0 GiB, ~0.8 GiB đang dùng
 ```
 
-### Tạo swap 4 GiB
+### Tạo lại swap 4 GiB nếu host mới chưa có
 ```bash
 sudo fallocate -l 4G /swapfile
 sudo chmod 600 /swapfile
@@ -86,7 +87,7 @@ AWS VPC DNS:
 172.31.0.2
 ```
 
-Port listen lúc kiểm tra: SSH TCP/22.
+Các listener ứng dụng đã quan sát: `22`, `2377`, `3001`, `5001`, `5044`, `5601`, `9200`, `9201` và `9600`. Xem ma trận port, Docker network và phạm vi nguồn trong [tài liệu cấu hình hợp nhất](2026-10-22_configuration-inventory-and-network-guide.md).
 
 ## 6. Firewall / Security Group
 
@@ -117,4 +118,4 @@ docker compose version
 
 ## 8. Đánh giá tài nguyên
 
-2 vCPU / 8 GiB RAM / 80 GB phù hợp cho PoC/lab nhỏ. Khi chạy ELK + Shuffle đồng thời, 16 GiB RAM sẽ an toàn hơn hoặc tách Shuffle sang máy khác.
+2 vCPU / 8 GiB RAM / 80 GB đủ cho PoC/lab nhỏ nhưng biên RAM thấp khi ELK và Shuffle chạy đồng thời. Giữ swap, theo dõi `free -h`, tránh chạy quá nhiều app replica không cần thiết; 16 GiB RAM hoặc tách Shuffle sẽ ổn định hơn.

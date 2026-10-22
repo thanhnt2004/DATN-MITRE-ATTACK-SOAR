@@ -1,15 +1,19 @@
 # Kiểm kê backup và chính sách lưu trữ
 
-Ngày đối chiếu: 13/10/2026
+Ngày đối chiếu gần nhất: 22/10/2026
 
 ## Đã lưu trên GitHub
 
 | Nội dung | Đường dẫn | Trạng thái |
 |---|---|---|
 | Docker Compose ELK | `elk/docker-compose.yml` | Đã đồng bộ |
+| Mẫu biến Kibana không chứa secret | `elk/.env.example` | Đã đồng bộ |
 | Logstash TLS pipeline | `elk/logstash/pipeline/logstash.conf` | Đã đồng bộ |
 | Filebeat inputs/output | `elk/filebeat/filebeat.yml` | Đã đồng bộ |
 | rsyslog relay pfSense | `elk/rsyslog/30-pfsense.conf` | Đã đồng bộ |
+| Mẫu biến Shuffle không chứa secret | `shuffle/.env.example` | Đã đồng bộ |
+| Sơ đồ mạng/Docker/response | `diagrams/*.mmd` | Đã đồng bộ |
+| Inventory và runbook hợp nhất | `docs/2026-10-22_configuration-inventory-and-network-guide.md` | Đã đồng bộ |
 | Script cấu hình EC2 | `scripts/configure-ec2-logstash.sh` | Đã đồng bộ |
 | Script cấu hình Ubuntu | `scripts/configure-ubuntu-ingest.sh` | Đã đồng bộ |
 | Báo cáo tiến độ/kiểm thử | `docs/` | Đã đồng bộ |
@@ -37,7 +41,8 @@ Git history đóng vai trò backup phiên bản cho các file cấu hình dạng
 | VMware Ubuntu Server | Chưa xác minh | VMware snapshot hoặc OVF export |
 | Flaskr SQLite | Chưa xác minh | File backup mã hóa ngoài Git |
 | Kibana saved objects | Chưa xác minh | Export NDJSON, loại bỏ secret |
-| Detection rules/Shuffle workflows | Chưa hoàn thiện | Export JSON/YAML đã khử secret |
+| Shuffle Manual smoke-test workflow | Đã chạy, chưa export | Export JSON đã bỏ execution authorization |
+| Detection rules/connector/playbook nghiệp vụ | Chưa hoàn thiện | Export JSON/YAML/NDJSON đã khử secret |
 
 ## Quy tắc trước khi commit
 

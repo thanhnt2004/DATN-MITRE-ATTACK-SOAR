@@ -42,27 +42,16 @@ Shuffle Workflow
 
 ## 3. Luồng dữ liệu thực tế
 
-```text
-[Endpoint lab Thanh]
-          |
-          | Beats 5044/TCP
-          v
-       [Logstash]
-          |
-          v
-   [Elasticsearch]
-          |
-          | Detection
-          v
-      [Sigma Rule]
-          |
-          | Alert/Webhook
-          v
-     [Shuffle SOAR]
-          |
-          +------> Analyst
-          |
-          +------> Automated Response
+```mermaid
+flowchart LR
+  pfs[pfSense] -->|UDP/5514| ubuntu[Ubuntu rsyslog relay]
+  ubuntu -->|Filebeat TLS/5044| logstash[Logstash]
+  windows[Windows Winlogbeat] -->|TLS/5044 target| logstash
+  logstash --> elastic[Elasticsearch]
+  elastic --> kibana[Kibana detection]
+  kibana -->|Webhook connector| shuffle[Shuffle frontend]
+  shuffle --> worker[Swarm worker/app]
+  worker --> analyst[Investigation/response]
 ```
 
 Ngoại lệ tạm thời đang được nhóm chấp nhận:
@@ -74,6 +63,8 @@ Ngoại lệ tạm thời đang được nhóm chấp nhận:
 ```
 
 Đường trực tiếp không qua filter của Logstash. Chỉ whitelist đúng địa chỉ nguồn `/32`; không mở `9200/TCP` cho toàn Internet.
+
+ELK và Shuffle dùng bridge ngoài `elk-shuffle-integration`; Kibana gọi Shuffle bằng hostname nội bộ `shuffle-frontend`. Shuffle runtime chạy trên Docker Swarm overlay `shuffle_swarm_executions`. Xem địa chỉ, port, account/key inventory và sơ đồ chi tiết trong [tài liệu cấu hình hợp nhất ngày 22/10/2026](2026-10-22_configuration-inventory-and-network-guide.md).
 
 ## 4. Mô hình triển khai hai thành viên
 
