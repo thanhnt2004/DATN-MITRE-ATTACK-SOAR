@@ -6,6 +6,8 @@ EC2 Ubuntu từng được truy cập bằng user `ubuntu` và SSH key lưu tron
 
 Script `scripts/setup-host.sh` là tham khảo cho Docker/swap và kernel; kiểm tra nội dung và backup trước khi chạy trên host đang vận hành. Repository `elk/docker-compose.yml` là **mẫu cũ có security=false**, không phản ánh EC2 đã bật security. Muốn dựng mới với security/TLS phải chuẩn bị compose, tài khoản dịch vụ và CA hợp lệ từ cấu hình runtime đã backup; chưa có bộ compose TLS được kiểm chứng đầy đủ trong repo. Không dùng mẫu cũ làm cấu hình production.
 
+Snapshot tham khảo đã loại secret của cấu hình EC2 live được lưu trong repository tại `elk/docker-compose.tls-reference.yml`. File thay các mật khẩu và ba encryption key bằng biến môi trường; chứng chỉ, private key, tài khoản dịch vụ và pipeline TLS live không nằm trong repo. Snapshot này chưa được triển khai mới hoặc xác minh khôi phục từ máy trống; không tự coi là bộ cài hoàn chỉnh. Healthcheck gốc dùng `curl -sk` để đọc mã HTTP, do đó không chứng minh CA hợp lệ.
+
 ## Truy cập và kiểm tra
 
 ```bash

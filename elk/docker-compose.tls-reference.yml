@@ -1,0 +1,111 @@
+# Sanitized reference from EC2; review certificates and bootstrap before deployment.
+services:
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.5.4
+    container_name: datn-elasticsearch
+    restart: unless-stopped
+
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "true"
+      xpack.security.http.ssl.enabled: "true"
+      xpack.security.http.ssl.key: "certs/elasticsearch/elasticsearch.key"
+      xpack.security.http.ssl.certificate: "certs/elasticsearch/elasticsearch.crt"
+      xpack.security.http.ssl.certificate_authorities: "certs/ca/ca.crt"
+      ES_JAVA_OPTS: "-Xms2g -Xmx2g"
+
+    ports:
+      - "9200:9200"
+
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+      - ./elasticsearch/certs:/usr/share/elasticsearch/config/certs:ro
+
+    networks:
+      - datn-elk
+
+    mem_limit: 3g
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          code=$$(curl -sk -o /dev/null -w '%{http_code}'
+          https://localhost:9200);
+          test "$$code" = "200" -o "$$code" = "401"
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.5.4
+    container_name: datn-kibana
+    restart: unless-stopped
+
+    environment:
+      ELASTICSEARCH_HOSTS: "https://elasticsearch:9200"
+      ELASTICSEARCH_USERNAME: "kibana_system"
+      ELASTICSEARCH_PASSWORD: "${KIBANA_SYSTEM_PASSWORD:?set in private environment}"
+      ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES: '["/usr/share/kibana/config/certs/es-ca.crt"]'
+      SERVER_HOST: "0.0.0.0"
+      NODE_OPTIONS: "--max-old-space-size=1536"
+      XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: "${KIBANA_ENCRYPTEDSAVEDOBJECTS_KEY:?set in private environment}"
+      XPACK_SECURITY_ENCRYPTIONKEY: "${KIBANA_SECURITY_KEY:?set in private environment}"
+      XPACK_REPORTING_ENCRYPTIONKEY: "${KIBANA_REPORTING_KEY:?set in private environment}"
+
+    ports:
+      - "5601:5601"
+
+    volumes:
+      - ./kibana/certs:/usr/share/kibana/config/certs:ro
+
+    networks:
+      datn-elk:
+      elk-shuffle-integration:
+
+    mem_limit: 2g
+
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:9.5.4
+    container_name: datn-logstash
+    restart: unless-stopped
+
+    environment:
+      LS_JAVA_OPTS: "-Xms512m -Xmx512m"
+      LOGSTASH_INTERNAL_PASSWORD: "${LOGSTASH_INTERNAL_PASSWORD:?set in private environment}"
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./logstash/certs:/usr/share/logstash/certs:ro
+
+    networks:
+      - datn-elk
+
+    mem_limit: 1g
+
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+
+volumes:
+  elasticsearch-data:
+
+
+networks:
+  datn-elk:
+    driver: bridge
+
+  elk-shuffle-integration:
+    external: true
+    name: elk-shuffle-integration
