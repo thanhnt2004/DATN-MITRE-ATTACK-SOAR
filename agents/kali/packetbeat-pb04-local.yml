@@ -1,0 +1,18 @@
+packetbeat.interfaces.device: eth0
+packetbeat.protocols:
+  - type: dns
+    ports: [53]
+    include_authorities: false
+    include_additionals: false
+    transaction_timeout: 5s
+
+processors:
+  - add_host_metadata: ~
+
+output.file:
+  path: /var/lib/packetbeat/pb04-local
+  filename: dns
+  rotate_every_kb: 10240
+  number_of_files: 2
+
+logging.level: info

@@ -1,0 +1,39 @@
+attack_technique: T1071.004
+display_name: 'Application Layer Protocol: DNS (DATN lab extension)'
+atomic_tests:
+  - name: 'DATN lab DNS query burst from Kali to pfSense resolver'
+    auto_generated_guid: 7ff17b4b-7cbf-48b7-97ab-0704d7c8d486
+    description: |
+      Query distinct, long TXT names under the reserved .test TLD through the
+      pfSense DNS resolver on VMnet10. No data is exfiltrated. Packetbeat on
+      Kali captures actual DNS packets for the PB04 playbook.
+    supported_platforms:
+      - linux
+    input_arguments:
+      resolver:
+        description: pfSense DNS resolver on isolated VMnet10
+        type: string
+        default: '192.168.10.1'
+      domain:
+        description: Reserved lab test domain
+        type: string
+        default: 'pb04-datn.test'
+      query_count:
+        description: Number of unique queries
+        type: integer
+        default: 30
+      script_path:
+        description: Local DNS query generator
+        type: path
+        default: PathToAtomicsFolder/T1071.004/src/pb04-dns-burst.sh
+    executor:
+      name: sh
+      elevation_required: false
+      command: |
+        bash '#{script_path}' '#{resolver}' '#{domain}' '#{query_count}'
+    dependencies:
+      - description: dig and lab query generator are available
+        prereq_command: |
+          command -v dig >/dev/null 2>&1 && test -f '#{script_path}'
+        get_prereq_command: |
+          echo 'Install dnsutils and copy the DATN lab script to the atomics folder.'

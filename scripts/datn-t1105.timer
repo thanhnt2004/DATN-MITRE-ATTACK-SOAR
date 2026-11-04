@@ -1,0 +1,11 @@
+[Unit]
+Description=Run DATN T1105 lab download detector every minute
+
+[Timer]
+OnBootSec=90s
+OnUnitActiveSec=60s
+AccuracySec=10s
+Unit=datn-t1105.service
+
+[Install]
+WantedBy=timers.target

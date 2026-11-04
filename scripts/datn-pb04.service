@@ -1,0 +1,10 @@
+[Unit]
+Description=DATN PB04 T1071.004 suspicious DNS detector
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+EnvironmentFile=/opt/datn-pb04/pb04.env
+ExecStart=/usr/bin/python3 /opt/datn-pb04/pb04_dns_detector.py --send --state-file /opt/datn-pb04/state.json --test-id PB04-AUTO --attack-source "Observed telemetry"

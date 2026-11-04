@@ -1,0 +1,10 @@
+[Unit]
+Description=DATN T1059.001 PowerShell investigation
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+EnvironmentFile=/opt/datn-t1059/t1059.env
+ExecStart=/usr/bin/python3 /opt/datn-t1059/t1059_powershell_detector.py --send --state-file /opt/datn-t1059/state.json

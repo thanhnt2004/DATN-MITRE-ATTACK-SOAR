@@ -1,0 +1,10 @@
+[Unit]
+Description=DATN PB01 T1110.003 password spraying detector
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+EnvironmentFile=/opt/datn-pb01/pb01.env
+ExecStart=/usr/bin/python3 /opt/datn-pb01/pb01_password_spraying.py --send --state-file /opt/datn-pb01/state.json --test-id PB01-AUTO --attack-source "Observed telemetry"

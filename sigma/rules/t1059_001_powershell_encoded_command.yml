@@ -1,0 +1,27 @@
+title: PowerShell Executed With Encoded Command
+id: 92d75362-3c26-4b6a-b3d4-c524bd59e578
+status: experimental
+description: Detects a PowerShell process using common encoded command switches for investigation.
+references:
+  - https://attack.mitre.org/techniques/T1059/001/
+  - https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1059.001/T1059.001.md
+tags:
+  - attack.execution
+  - attack.t1059.001
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  executable:
+    Image|endswith:
+      - '\powershell.exe'
+      - '\pwsh.exe'
+  argument:
+    CommandLine|contains:
+      - ' -e '
+      - ' -enc '
+      - ' -encodedcommand '
+  condition: executable and argument
+falsepositives:
+  - Legitimate management scripts and automation may use encoded commands.
+level: medium

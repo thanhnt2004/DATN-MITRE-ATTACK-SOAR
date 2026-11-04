@@ -1,0 +1,1 @@
+DATN T1105 benign test artifact. This file is not executable and contains no secrets.

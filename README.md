@@ -1,5 +1,9 @@
 # DATN – MITRE ATT&CK Detection & Automated Response
 
+> **Tài liệu cập nhật 04/11/2026:** bắt đầu tại [hướng dẫn hệ thống](docs/huong-dan/README.md). Các mục lịch sử bên dưới có thể mô tả cấu hình cũ; đặc biệt, EC2 live đã bật Elastic security/TLS, còn `elk/docker-compose.yml` trong repo là mẫu cũ và không được triển khai đè live.
+
+> Thực tế lab: PB01, PB04, T1059 và T1105 dùng detector Python/timer; T1046 trong báo cáo gốc gọi webhook thủ công. T1105 quarantine giới hạn vào marker lab qua responder host, không phải giải pháp cách ly tệp tổng quát.
+
 ## Đề tài
 **Xây dựng và đánh giá hệ thống phát hiện và ứng phó tự động theo MITRE ATT&CK**
 
@@ -83,12 +87,11 @@ DATN-MITRE-ATTACK-SOAR/
 - Filebeat 9.5.4 thu thập system/auth/Nginx log và gửi đến Logstash qua TLS `5044/TCP`.
 - Ubuntu đang nhận Syslog dành cho pfSense tại `5514/UDP` và chuyển tiếp bằng Filebeat.
 - Log Ubuntu và log pfSense đã xuất hiện trong các index `datn-ubuntu-*` và `datn-pfsense-*`; khi VM tắt sẽ không có telemetry mới.
-- Windows/Winlogbeat và Linux/Auditbeat đã có dữ liệu trong Elasticsearch; cấu hình guest chi tiết phải được đối chiếu trên đúng VM trước mỗi buổi demo.
+- Windows 10/Winlogbeat và Sysmon đã có dữ liệu thật; cấu hình Linux/Auditbeat của nguồn khác cần đối chiếu trên đúng VM trước mỗi buổi demo.
 - Elasticsearch đang ở trạng thái `yellow` do mô hình một node không thể phân bổ replica; primary shard vẫn hoạt động.
 - Kibana đã có ba encryption key; Actions và Rules API trả HTTP `200`.
-- Docker Swarm một node, worker Shuffle và app runtime đã hoạt động; workflow Manual đã kết thúc `FINISHED` với action `SUCCESS`.
-- Kết nối dùng chung `elk-shuffle-integration` nối Kibana với Shuffle frontend; connector/webhook end-to-end chưa được tạo.
-- Cảnh báo: Elastic security hiện tắt; Kibana và các API chỉ được phép mở cho đúng IP nguồn `/32`, không dùng `0.0.0.0/0`.
+- Docker Swarm một node, worker Shuffle và app runtime đã hoạt động. Một số playbook đã gửi webhook qua detector Python; không đồng nghĩa mọi Elastic Detection Rule/connector đã được tạo.
+- Elastic security bật trên EC2 tại lần kiểm tra 04/11/2026. Kiểm tra lại Security Group và hạn chế nguồn kết nối theo nhu cầu thực tế.
 
 Tài liệu hợp nhất mới nhất: [kiểm kê cấu hình, tài khoản/key đã che, sơ đồ mạng và runbook ngày 22/10/2026](docs/2026-10-22_configuration-inventory-and-network-guide.md).
 

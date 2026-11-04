@@ -1,0 +1,20 @@
+packetbeat.interfaces.device: eth0
+packetbeat.protocols:
+  - type: dns
+    ports: [53]
+    include_authorities: false
+    include_additionals: false
+    transaction_timeout: 5s
+
+fields:
+  log_source: pb04-dns
+
+processors:
+  - add_host_metadata: ~
+
+output.logstash:
+  hosts: ["18.139.50.205:5044"]
+  ssl.certificate_authorities:
+    - /etc/packetbeat/certs/ca.crt
+
+logging.level: info
