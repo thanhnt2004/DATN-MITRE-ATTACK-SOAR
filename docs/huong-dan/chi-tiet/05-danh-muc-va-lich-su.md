@@ -12,6 +12,8 @@
 
 Các báo cáo ngày 08–31/10 và kế hoạch là lịch sử hữu ích, có thể mô tả trạng thái đã thay đổi. Ưu tiên tài liệu mới và trạng thái live được kiểm tra. Không xóa báo cáo khác chỉ vì cùng chủ đề; chỉ xem trùng khi nội dung giống hệt hoặc đã đối chiếu đầy đủ.
 
+Ngày 04/11/2026, đã dọn 15 file ảnh chụp trạng thái/ghi chú cũ khỏi gốc dự án và `docs`. Danh mục cùng SHA-256 nằm tại `D:\DATN\archive\2026-11-04-danh-muc-don-dep.json`; bản sao trước khi dọn được kiểm tra trong `D:\DATN\archive\2026-11-04-tai-lieu-cu-truoc-don-dep.zip`. Manifest liệt kê cả một số tài liệu vẫn được giữ do còn liên kết tham chiếu; trạng thái xóa thực tế nằm trong `removed_paths`. Bằng chứng kiểm thử, tài liệu của các gói cài đặt, private và checkout Git được giữ.
+
 ## Thư mục dự án
 
 | Đường dẫn | Mục đích |
